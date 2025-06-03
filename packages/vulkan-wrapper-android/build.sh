@@ -1,13 +1,18 @@
+PKG_VER=25.0.0-[gss]
+PKG_CATEGORY="VulkanDriver"
+PKG_PRETTY_NAME="Mesa Android Wrapper"
+VK_DRIVER_LIB="libvulkan_wrapper.so"
+
 TERMUX_PKG_HOMEPAGE=https://www.mesa3d.org
-TERMUX_PKG_DESCRIPTION="Android Vulkan ICD"
+TERMUX_PKG_DESCRIPTION="Mesa Vulkan wrapper ICD pentru Android"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="docs/license.rst"
-TERMUX_PKG_MAINTAINER="xMeM <haooy@outlook.com>"
-TERMUX_PKG_VERSION="25.0.0"
-TERMUX_PKG_REVISION=2
-TERMUX_PKG_SRCURL=git+https://github.com/xMeM/mesa
+TERMUX_PKG_MAINTAINER="Pipetto-crypto <name@example.com>"
+TERMUX_PKG_VERSION=${PKG_VER}
+TERMUX_PKG_REVISION=1
+TERMUX_PKG_SRCURL=git+https://gitlab.freedesktop.org/Pipetto-crypto/mesa
 TERMUX_PKG_GIT_BRANCH=wrapper
-_COMMIT=e65c7eb6ee2f9903c3256f2677beb1d98464103f
+_COMMIT=bae70519ffa58c8e455a003bc453b60250c3047b
 TERMUX_PKG_DEPENDS="libandroid-shmem, libc++, libdrm, libx11, libxcb, libxshmfence, libwayland, vulkan-loader-generic, zlib, zstd"
 TERMUX_PKG_BUILD_DEPENDS="libwayland-protocols, libxrandr, xorgproto"
 TERMUX_PKG_API_LEVEL=26
@@ -17,19 +22,21 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dcpp_rtti=false
 -Dgbm=disabled
 -Dopengl=false
+-Degl=disabled
 -Dllvm=disabled
 -Dshared-llvm=disabled
 -Dplatforms=x11,wayland
 -Dgallium-drivers=
+-Dglvnd=disabled
+-Dzstd=enabled
 -Dxmlconfig=disabled
 -Dvulkan-drivers=wrapper
 -Db_ndebug=true
 "
 
 termux_step_post_get_source() {
-	git fetch --unshallow
+	git fetch --unshallow || true
 	git checkout $_COMMIT
-	# Do not use meson wrap projects
 	rm -rf subprojects
 }
 
@@ -37,10 +44,11 @@ termux_step_pre_configure() {
 	termux_setup_cmake
 
 	CPPFLAGS+=" -D__USE_GNU"
-	LDFLAGS+=" -landroid-shmem"
+	LDFLAGS+=" -L$TERMUX_PREFIX/lib -landroid-shmem"
 
 	_WRAPPER_BIN=$TERMUX_PKG_BUILDDIR/_wrapper/bin
 	mkdir -p $_WRAPPER_BIN
+
 	if [ "$TERMUX_ON_DEVICE_BUILD" = "false" ]; then
 		sed 's|@CMAKE@|'"$(command -v cmake)"'|g' \
 			$TERMUX_PKG_BUILDER_DIR/cmake-wrapper.in \
