@@ -4,7 +4,7 @@ PKG_PRETTY_NAME="Mesa Android Wrapper"
 VK_DRIVER_LIB="libvulkan_wrapper.so"
 
 TERMUX_PKG_HOMEPAGE=https://www.mesa3d.org
-TERMUX_PKG_DESCRIPTION="Mesa Vulkan wrapper ICD pentru Android"
+TERMUX_PKG_DESCRIPTION="Android Vulkan ICD"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="docs/license.rst"
 TERMUX_PKG_MAINTAINER="Pipetto-crypto <name@example.com>"
@@ -42,9 +42,9 @@ termux_step_post_get_source() {
 
 termux_step_pre_configure() {
 	termux_setup_cmake
-
+ 
 	CPPFLAGS+=" -D__USE_GNU"
-	LDFLAGS+=" -L$TERMUX_PREFIX/lib -landroid-shmem"
+	LDFLAGS+=" -landroid-shmem"
 
 	_WRAPPER_BIN=$TERMUX_PKG_BUILDDIR/_wrapper/bin
 	mkdir -p $_WRAPPER_BIN
