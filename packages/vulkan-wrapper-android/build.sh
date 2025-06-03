@@ -36,10 +36,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 
 termux_step_post_get_source() {
 	git fetch --unshallow || true
- 	git checkout $_COMMIT
- 	rm -rf subprojects
-  
-	mkdir -p subprojects
+	git checkout $_COMMIT
+	rm -rf subprojects
+
+  	mkdir -p subprojects
 	cat > subprojects/libadrenotools.wrap <<-EOF
 [wrap-git]
 directory=libadrenotools
