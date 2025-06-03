@@ -39,7 +39,7 @@ termux_step_post_get_source() {
 	git checkout $_COMMIT
 	rm -rf subprojects
 
-  	mkdir -p subprojects
+	mkdir -p subprojects
 	cat > subprojects/libadrenotools.wrap <<-EOF
 [wrap-git]
 directory=libadrenotools
