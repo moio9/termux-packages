@@ -37,8 +37,17 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 termux_step_post_get_source() {
 	git fetch --unshallow || true
 	git checkout $_COMMIT
-	rm -rf subprojects
+ 	rm -rf subprojects
+
+	mkdir -p subprojects
+	cat > subprojects/libadrenotools.wrap <<-EOF
+[wrap-git]
+directory=libadrenotools
+url=https://gitlab.freedesktop.org/Pipetto-crypto/libadrenotools.git
+revision=HEAD
+EOF
 }
+
 
 termux_step_pre_configure() {
 	termux_setup_cmake
