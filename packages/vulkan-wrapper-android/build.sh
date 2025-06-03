@@ -1,4 +1,4 @@
-PKG_VER=25.0.0-[gss]
+PKG_VER=25.0.0
 PKG_CATEGORY="VulkanDriver"
 PKG_PRETTY_NAME="Mesa Android Wrapper"
 VK_DRIVER_LIB="libvulkan_wrapper.so"
@@ -9,7 +9,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="docs/license.rst"
 TERMUX_PKG_MAINTAINER="Pipetto-crypto <name@example.com>"
 TERMUX_PKG_VERSION=${PKG_VER}
-TERMUX_PKG_REVISION=1
+TERMUX_PKG_REVISION=gss
 TERMUX_PKG_SRCURL=git+https://gitlab.freedesktop.org/Pipetto-crypto/mesa
 TERMUX_PKG_GIT_BRANCH=wrapper
 _COMMIT=bae70519ffa58c8e455a003bc453b60250c3047b
