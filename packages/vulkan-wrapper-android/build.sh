@@ -53,6 +53,12 @@ EOF
 
 	cd subprojects
 	git clone --recurse-submodules https://github.com/Pipetto-crypto/libadrenotools.git
+
+	_target_file="$TERMUX_PKG_SRCDIR/src/vulkan/wsi/wsi_common_x11.c"
+	if [ -f "$_target_file" ]; then
+		sed -i '/typedef struct.*native_handle/,/} native_handle_t;/s/^/\/\//' "$_target_file"
+	fi
+
 	cd "$TERMUX_PKG_SRCDIR"
 }
 
