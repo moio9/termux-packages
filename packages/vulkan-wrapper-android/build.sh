@@ -69,11 +69,18 @@ EOF
 			fi
 		done
 
-	sed -i '/#ifdef __TERMUX__/,/#endif/{
-		/#include <android\/hardware_buffer.h>/!{
-			/#include <sys\/socket.h>/!d
-		}
-	}' src/vulkan/wsi/wsi_common_x11.c
+	_target_file="$TERMUX_PKG_SRCDIR/src/vulkan/wsi/wsi_common_x11.c"
+	if [ ! -f "$_target_file" ]; then
+		# fallback, poate e în altă parte
+		_target_file=$(find "$TERMUX_PKG_SRCDIR" -name wsi_common_x11.c | head -n1)
+	fi
+
+	if [ -f "$_target_file" ]; then
+		sed -i '/typedef struct.*native_handle/,/} native_handle_t;/s/^/\/\//' "$_target_file"
+	else
+		echo "EROARE: Nu găsesc wsi_common_x11.c în $TERMUX_PKG_SRCDIR"
+		exit 1
+	fi
 
 	cd "$TERMUX_PKG_SRCDIR"
 }
