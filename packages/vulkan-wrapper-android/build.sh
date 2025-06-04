@@ -44,6 +44,11 @@ termux_step_post_get_source() {
 	sed -i '/adrenotools_subproj/d' src/vulkan/wrapper/meson.build
 
 	sed -i '/wsi_common_x11.c/d' src/vulkan/wsi/meson.build
+
+	find src/vulkan/wrapper -type f -name "*.c" -o -name "*.h" | while read f; do
+		sed -i '/#include "adrenotools\/driver.h"/d' "$f"
+		sed -i '/adrenotools_/d' "$f"
+	done
 }
 
 
