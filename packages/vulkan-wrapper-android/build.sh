@@ -56,7 +56,7 @@ EOF
 
 	find "$TERMUX_PKG_SRCDIR" \( -name '*.c' -o -name '*.h' \) \
 		-exec sed -i '/typedef struct native_handle/,/} native_handle_t;/d' {} +
-	
+
 	find "$TERMUX_PKG_SRCDIR" \( -name '*.c' -o -name '*.h' \) \
 		-exec grep -l 'native_handle_t' {} \; \
 		| while read -r f; do
