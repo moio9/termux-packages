@@ -56,7 +56,7 @@ EOF
 
 	target_file="$TERMUX_PKG_SRCDIR/src/vulkan/wsi/wsi_common_x11.c"
 	if [ -f "$target_file" ]; then
-		sed -i '/typedef struct.*native_handle/,/} native_handle_t;/s/^/\/\//' "$target_file"
+		sed -i '/typedef struct.*native_handle/,/} native_handle_t;/d' "$target_file"
 	fi
 
 	cd "$TERMUX_PKG_SRCDIR"
