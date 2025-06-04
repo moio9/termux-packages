@@ -80,11 +80,15 @@ termux_step_pre_configure() {
 	fi
 	export PATH=$_WRAPPER_BIN:$PATH
 
-	target_file="$TERMUX_PKG_SRCDIR/src/vulkan/wsi/wsi_common_x11.c"
-
-	if grep -q '#include <sys/socket.h>' "$target_file"; then
+	local target_file="$TERMUX_PKG_SRCDIR/src/vulkan/wsi/wsi_common_x11.c"
+	if [ -f "$target_file" ] && grep -q '#include <sys/socket.h>' "$target_file"; then
 		sed -i '/#include <sys\/socket.h>/i \
-	#ifdef __ANDROID__\n#ifndef _SA_FAMILY_T_DEFINED\n#define _SA_FAMILY_T_DEFINED\ntypedef unsigned short sa_family_t;\n#endif\n#endif' "$target_file"
+	#if defined(__ANDROID__) && __ANDROID_API__ < 24\n\
+	#ifndef _SA_FAMILY_T_DEFINED\n\
+	#define _SA_FAMILY_T_DEFINED\n\
+	typedef unsigned short sa_family_t;\n\
+	#endif\n\
+	#endif' "$target_file"
 	fi
 }
 
