@@ -32,6 +32,7 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dxmlconfig=disabled
 -Dvulkan-drivers=wrapper
 -Db_ndebug=true
+-Dc_args="-Wno-error"
 "
 
 termux_step_post_get_source() {
