@@ -39,6 +39,13 @@ termux_step_post_get_source() {
 	git fetch --unshallow || true
 	git checkout $_COMMIT
 	rm -rf subprojects
+
+	cat <<EOF > subprojects/libadrenotools.wrap
+[wrap-git]
+directory = libadrenotools
+url = https://github.com/Pipetto-crypto/libadrenotools.git
+revision = main
+EOF
 }
 
 
