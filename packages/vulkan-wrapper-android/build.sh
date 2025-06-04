@@ -75,6 +75,10 @@ EOF
 	find . \( -name '*.c' -o -name '*.h' \) \
 		-exec grep -Hn 'native_handle_t' {} \; | grep -v 'android_stub/cutils/native_handle.h'
 	echo "============================"
+
+	find "$TERMUX_PKG_SRCDIR" \( -name '*.c' -o -name '*.h' \) \
+		! -path '*/android_stub/cutils/native_handle.h' \
+		-exec sed -i '/typedef struct native_handle/,/} native_handle_t;/d' {} +
 }
 
 
