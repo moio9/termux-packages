@@ -42,6 +42,8 @@ termux_step_post_get_source() {
 	sed -i '/subproject.*libadrenotools/d' src/vulkan/wrapper/meson.build
 	sed -i '/libadrenotools_dep/d' src/vulkan/wrapper/meson.build
 	sed -i '/adrenotools_subproj/d' src/vulkan/wrapper/meson.build
+
+ 	sed -i '/typedef struct native_handle native_handle_t;/d' src/vulkan/wsi/wsi_common_x11.c
 }
 
 
