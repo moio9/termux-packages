@@ -55,13 +55,14 @@ EOF
 	git clone --recurse-submodules https://github.com/Pipetto-crypto/libadrenotools.git
 
 	find "$TERMUX_PKG_SRCDIR" \( -name '*.c' -o -name '*.h' \) \
+		! -path '*/android_stub/cutils/native_handle.h' \
 		-exec sed -i '/typedef struct native_handle/,/} native_handle_t;/d' {} +
 
 	find "$TERMUX_PKG_SRCDIR" \( -name '*.c' -o -name '*.h' \) \
 		-exec grep -l 'native_handle_t' {} \; \
 		| while read -r f; do
 			case "$f" in
-				*android_stub/cutils/native_handle.h*) continue ;;  # exclude explicit!
+				*android_stub/cutils/native_handle.h*) continue ;;
 			esac
 			if ! grep -q 'android_stub/cutils/native_handle.h' "$f"; then
 				sed -i '1i #include <android_stub/cutils/native_handle.h>' "$f"
