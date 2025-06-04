@@ -61,7 +61,7 @@ EOF
 		-exec grep -l 'native_handle_t' {} \; \
 		| while read -r f; do
 			case "$f" in
-				*android_stub/cutils/native_handle.h*) continue ;; # <-- exclude aici
+				*android_stub/cutils/native_handle.h*) continue ;;  # exclude explicit!
 			esac
 			if ! grep -q 'android_stub/cutils/native_handle.h' "$f"; then
 				sed -i '1i #include <android_stub/cutils/native_handle.h>' "$f"
