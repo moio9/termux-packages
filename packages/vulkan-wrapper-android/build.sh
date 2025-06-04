@@ -53,6 +53,7 @@ EOF
 
 	cd subprojects
 	git clone --recurse-submodules https://github.com/Pipetto-crypto/libadrenotools.git
+	cd "$TERMUX_PKG_SRCDIR"
 }
 
 
