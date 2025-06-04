@@ -57,7 +57,8 @@ EOF
 	find "$TERMUX_PKG_SRCDIR" \( -name '*.c' -o -name '*.h' \) \
 		-exec grep -l 'native_handle_t' {} \; \
 		| while read -r f; do
-			if ! grep -q 'android_stub/cutils/native_handle.h' "$f"; then
+
+			if [[ "$f" != *cutils/native_handle.h* ]] && ! grep -q 'android_stub/cutils/native_handle.h' "$f"; then
 				sed -i '1i #include <android_stub/cutils/native_handle.h>' "$f"
 			fi
 		done
