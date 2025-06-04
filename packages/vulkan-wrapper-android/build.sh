@@ -79,22 +79,6 @@ termux_step_pre_configure() {
 		termux_setup_wayland_cross_pkg_config_wrapper
 	fi
 	export PATH=$_WRAPPER_BIN:$PATH
-
-	local target_file="$TERMUX_PKG_SRCDIR/src/vulkan/wsi/wsi_common_x11.c"
-
-       if [ -f "$target_file" ] && [ "$TERMUX_PKG_API_LEVEL" -lt 24 ] && grep -q '#include <sys/socket.h>' "$target_file"; then
-               awk '
-                       /#include <sys\/socket.h>/ {
-                               print "#if defined(__ANDROID__) && __ANDROID_API__ < 24"
-                               print "#ifndef _SA_FAMILY_T_DEFINED"
-                               print "#define _SA_FAMILY_T_DEFINED"
-                               print "typedef unsigned short sa_family_t;"
-                               print "#endif"
-                               print "#endif"
-                       }
-                       { print }
-               ' "$target_file" > "$target_file.new" && mv "$target_file.new" "$target_file"
-       fi
 }
 
 
