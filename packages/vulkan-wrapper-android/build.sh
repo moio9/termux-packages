@@ -9,7 +9,7 @@ TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_LICENSE_FILE="docs/license.rst"
 TERMUX_PKG_MAINTAINER="Pipetto-crypto <name@example.com>"
 TERMUX_PKG_VERSION=${PKG_VER}
-TERMUX_PKG_REVISION=gss
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=git+https://gitlab.freedesktop.org/Pipetto-crypto/mesa
 TERMUX_PKG_GIT_BRANCH=wrapper
 _COMMIT=8c8e0079152a247dc37f1d81bb0162afcdba9e60
@@ -53,12 +53,6 @@ EOF
 
 	cd subprojects
 	git clone --recurse-submodules https://github.com/Pipetto-crypto/libadrenotools.git
-
-	_target_file="$TERMUX_PKG_SRCDIR/src/vulkan/wsi/wsi_common_x11.c"
-	if [ -f "$_target_file" ]; then
-		sed -i '73d' "$_target_file"
-		sed -i '/typedef struct.*native_handle/,/} native_handle_t;/s/^/\/\//' "$_target_file"
-	fi
 }
 
 
