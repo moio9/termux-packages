@@ -56,9 +56,9 @@ EOF
 
 	_target_file="$TERMUX_PKG_SRCDIR/src/vulkan/wsi/wsi_common_x11.c"
 	if [ -f "$_target_file" ]; then
-		sed -i '/typedef struct *native_handle_t/,/} *native_handle_t;/s/^/\/\//' "$_target_file"
+		sed -i '/#ifdef __TERMUX__/,/#include <sys\/socket.h>/s/^/\/\//' "$_target_file"
 	fi
-	cat "$_target_file" | grep native_handle
+
 	cd "$TERMUX_PKG_SRCDIR"
 }
 
