@@ -95,10 +95,6 @@ termux_step_pre_configure() {
                        { print }
                ' "$target_file" > "$target_file.new" && mv "$target_file.new" "$target_file"
        fi
-\1#ifndef __TERMUX__\
-\n\1VK_PRESENT_MODE_IMMEDIATE_KHR,\
-\n\1#endif/' "$target_file"
-	fi
 }
 
 
