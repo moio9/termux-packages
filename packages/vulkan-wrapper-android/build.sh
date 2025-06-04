@@ -52,7 +52,7 @@ termux_step_post_get_source() {
 	done
 
 	echo 'typedef __native_handle_t native_handle_t;' >> src/include/android_stub/vndk/hardware_buffer.h
-	
+
 	sed -i '/^}$/i return VK_ERROR_INITIALIZATION_FAILED;' src/vulkan/wrapper/wrapper_instance.c
 
 }
