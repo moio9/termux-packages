@@ -39,22 +39,6 @@ termux_step_post_get_source() {
 	git fetch --unshallow || true
 	git checkout $_COMMIT
 	rm -rf subprojects
-
-	sed -i '/subproject.*libadrenotools/d' src/vulkan/wrapper/meson.build
-	sed -i '/libadrenotools_dep/d' src/vulkan/wrapper/meson.build
-	sed -i '/adrenotools_subproj/d' src/vulkan/wrapper/meson.build
-
-	sed -i '/wsi_common_x11.c/d' src/vulkan/wsi/meson.build
-
-	find src/vulkan/wrapper -type f -name "*.c" -o -name "*.h" | while read f; do
-		sed -i '/#include "adrenotools\/driver.h"/d' "$f"
-		sed -i '/adrenotools_/d' "$f"
-	done
-
-	echo 'typedef __native_handle_t native_handle_t;' >> src/include/android_stub/vndk/hardware_buffer.h
-
-	sed -i '/^}$/i return VK_ERROR_INITIALIZATION_FAILED;' src/vulkan/wrapper/wrapper_instance.c
-
 }
 
 
