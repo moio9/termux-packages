@@ -73,7 +73,7 @@ EOF
 		/#include <android\/hardware_buffer.h>/!{
 			/#include <sys\/socket.h>/!d
 		}
-	}' src/src/vulkan/wsi/wsi_common_x11.c
+	}' src/vulkan/wsi/wsi_common_x11.c
 
 	cd "$TERMUX_PKG_SRCDIR"
 }
