@@ -43,8 +43,7 @@ termux_step_post_get_source() {
 	sed -i '/libadrenotools_dep/d' src/vulkan/wrapper/meson.build
 	sed -i '/adrenotools_subproj/d' src/vulkan/wrapper/meson.build
 
-	sed -i 's|#include <cutils/native_handle.h>|// removed native_handle.h|g' src/vulkan/wsi/wsi_common_x11.c
-	sed -i '73d' src/vulkan/wsi/wsi_common_x11.c
+	sed -i '/wsi_common_x11.c/d' src/vulkan/wsi/meson.build
 }
 
 
