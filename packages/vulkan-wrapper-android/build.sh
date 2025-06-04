@@ -41,6 +41,7 @@ termux_step_post_get_source() {
 
 	sed -i '/subproject.*libadrenotools/d' src/vulkan/wrapper/meson.build
 	sed -i '/libadrenotools_dep/d' src/vulkan/wrapper/meson.build
+	sed -i '/adrenotools_subproj/d' src/vulkan/wrapper/meson.build
 }
 
 
