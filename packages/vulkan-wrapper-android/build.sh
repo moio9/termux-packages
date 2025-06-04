@@ -81,16 +81,25 @@ termux_step_pre_configure() {
 	export PATH=$_WRAPPER_BIN:$PATH
 
 	local target_file="$TERMUX_PKG_SRCDIR/src/vulkan/wsi/wsi_common_x11.c"
+
 	if [ -f "$target_file" ] && grep -q '#include <sys/socket.h>' "$target_file"; then
 		sed -i '/#include <sys\/socket.h>/i \
-	#if defined(__ANDROID__) && __ANDROID_API__ < 24\n\
-	#ifndef _SA_FAMILY_T_DEFINED\n\
-	#define _SA_FAMILY_T_DEFINED\n\
-	typedef unsigned short sa_family_t;\n\
-	#endif\n\
-	#endif' "$target_file"
+#if defined(__ANDROID__) && __ANDROID_API__ < 24\n\
+#ifndef _SA_FAMILY_T_DEFINED\n\
+#define _SA_FAMILY_T_DEFINED\n\
+typedef unsigned short sa_family_t;\n\
+#endif\n\
+#endif' "$target_file"
+	fi
+
+	if [ -f "$target_file" ] && ! grep -q '__TERMUX__' "$target_file"; then
+		sed -i '/static const VkPresentModeKHR present_modes\[\] = {/,/VK_PRESENT_MODE_MAILBOX_KHR,/s/^\(\s*\)VK_PRESENT_MODE_IMMEDIATE_KHR,/\
+\1#ifndef __TERMUX__\
+\n\1VK_PRESENT_MODE_IMMEDIATE_KHR,\
+\n\1#endif/' "$target_file"
 	fi
 }
+
 
 termux_step_post_configure() {
 	rm -f $_WRAPPER_BIN/cmake
