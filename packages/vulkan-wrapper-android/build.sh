@@ -64,7 +64,7 @@ EOF
 	sed -i '1i #include <android_stub/cutils/native_handle.h>' "$TERMUX_PKG_SRCDIR/include/android_stub/vndk/hardware_buffer.h"
 
 	sed -i '1i #include <android_stub/cutils/native_handle.h>' "$TERMUX_PKG_SRCDIR/src/vulkan/wrapper/wrapper_device_memory.c"
-	
+
 	# ------------------------------------------
 
 	cd "$TERMUX_PKG_SRCDIR"
