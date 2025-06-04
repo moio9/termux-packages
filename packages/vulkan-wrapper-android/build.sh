@@ -35,15 +35,23 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 -Dc_args="-Wno-error"
 "
 
-
 termux_step_post_get_source() {
 	git fetch --unshallow || true
 	git checkout $_COMMIT
 
-	rm -rf subprojects/libadrenotools
+	rm -rf subprojects
 	mkdir -p subprojects
-	git clone --depth=1 https://github.com/Pipetto-crypto/libadrenotools.git subprojects/libadrenotools
+
+	cat <<EOF > subprojects/libadrenotools.wrap
+[wrap-git]
+directory = libadrenotools
+url = https://github.com/Pipetto-crypto/libadrenotools.git
+revision = master
+depth = 1
+recursive = true
+EOF
 }
+
 
 
 termux_step_pre_configure() {
