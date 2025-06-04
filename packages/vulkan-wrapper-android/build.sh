@@ -54,11 +54,13 @@ EOF
 	cd subprojects
 	git clone --recurse-submodules https://github.com/Pipetto-crypto/libadrenotools.git
 
-	find "$TERMUX_PKG_SRCDIR" \( -name '*.c' -o -name '*.h' \) \
+	cd "$TERMUX_PKG_SRCDIR"
+
+	find . \( -name '*.c' -o -name '*.h' \) \
 		! -path '*/android_stub/cutils/native_handle.h' \
 		-exec sed -i '/typedef struct native_handle/,/} native_handle_t;/d' {} +
 
-	find "$TERMUX_PKG_SRCDIR" \( -name '*.c' -o -name '*.h' \) \
+	find . \( -name '*.c' -o -name '*.h' \) \
 		-exec grep -l 'native_handle_t' {} \; \
 		| while read -r f; do
 			case "$f" in
@@ -69,20 +71,10 @@ EOF
 			fi
 		done
 
-	_target_file="$TERMUX_PKG_SRCDIR/src/vulkan/wsi/wsi_common_x11.c"
-	if [ ! -f "$_target_file" ]; then
-		# fallback, poate e în altă parte
-		_target_file=$(find "$TERMUX_PKG_SRCDIR" -name wsi_common_x11.c | head -n1)
-	fi
-
-	if [ -f "$_target_file" ]; then
-		sed -i '/typedef struct.*native_handle/,/} native_handle_t;/s/^/\/\//' "$_target_file"
-	else
-		echo "EROARE: Nu găsesc wsi_common_x11.c în $TERMUX_PKG_SRCDIR"
-		exit 1
-	fi
-
-	cd "$TERMUX_PKG_SRCDIR"
+	echo "==== VERIFICĂ DUPLICATE ===="
+	find . \( -name '*.c' -o -name '*.h' \) \
+		-exec grep -Hn 'native_handle_t' {} \; | grep -v 'android_stub/cutils/native_handle.h'
+	echo "============================"
 }
 
 
