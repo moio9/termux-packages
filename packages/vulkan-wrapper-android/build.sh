@@ -54,18 +54,13 @@ EOF
 	cd subprojects
 	git clone --recurse-submodules https://github.com/Pipetto-crypto/libadrenotools.git
 
-	# ----------- PATCH NATIV HANDLE -----------
-
-	target_file="$TERMUX_PKG_SRCDIR/src/vulkan/wsi/wsi_common_x11.c"
-	if [ -f "$target_file" ]; then
-		sed -i '/typedef struct/,/} native_handle_t;/d' "$target_file"
-	fi
-
-	sed -i '1i #include <android_stub/cutils/native_handle.h>' "$TERMUX_PKG_SRCDIR/include/android_stub/vndk/hardware_buffer.h"
-
-	sed -i '1i #include <android_stub/cutils/native_handle.h>' "$TERMUX_PKG_SRCDIR/src/vulkan/wrapper/wrapper_device_memory.c"
-
-	# ------------------------------------------
+	find "$TERMUX_PKG_SRCDIR" \( -name '*.c' -o -name '*.h' \) \
+		-exec grep -l 'native_handle_t' {} \; \
+		| while read -r f; do
+			if ! grep -q 'android_stub/cutils/native_handle.h' "$f"; then
+				sed -i '1i #include <android_stub/cutils/native_handle.h>' "$f"
+			fi
+		done
 
 	cd "$TERMUX_PKG_SRCDIR"
 }
