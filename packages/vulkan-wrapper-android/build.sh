@@ -53,6 +53,9 @@ EOF
 
 	cd subprojects
 	git clone --recurse-submodules https://github.com/Pipetto-crypto/libadrenotools.git
+
+	sed -i '73d' src/vulkan/wsi/wsi_common_x11.c
+	sed -i '/typedef struct.*native_handle/,/} native_handle_t;/s/^/\/\//' src/vulkan/wsi/wsi_common_x11.c
 }
 
 
