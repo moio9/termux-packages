@@ -53,22 +53,25 @@ EOF
 
 	cd subprojects
 	git clone --recurse-submodules https://github.com/Pipetto-crypto/libadrenotools.git
-
 	cd "$TERMUX_PKG_SRCDIR"
 
-	find . \( -name '*.c' -o -name '*.h' \) ! -path '*/android_stub/cutils/native_handle.h' \
-	    -exec sed -i '/typedef struct native_handle/,/} native_handle_t;/d' {} +
-
+	# 1. Șterge orice redefinire directă de native_handle_t
 	find . \( -name '*.c' -o -name '*.h' \) \
-	    -exec grep -l 'native_handle_t' {} \; | while read -r f; do
-	    case "$f" in
-	        *android_stub/cutils/native_handle.h*) continue ;;
-	    esac
-	    if ! grep -q 'android_stub/cutils/native_handle.h' "$f"; then
-	        sed -i '1i #include <android_stub/cutils/native_handle.h>' "$f"
-	    fi
+		! -path '*/android_stub/cutils/native_handle.h' \
+		-exec sed -i '/typedef struct native_handle/,/} native_handle_t;/d' {} +
+
+	# 2. Include headerul oficial oriunde se folosește native_handle_t și nu e deja inclus
+	find . \( -name '*.c' -o -name '*.h' \) \
+		-exec grep -l 'native_handle_t' {} \; | while read -r f; do
+		case "$f" in
+			*android_stub/cutils/native_handle.h*) continue ;;
+		esac
+		if ! grep -q 'android_stub/cutils/native_handle.h' "$f"; then
+			sed -i '1i #include <android_stub/cutils/native_handle.h>' "$f"
+		fi
 	done
 
+	# 3. Debug: vezi dacă mai există definiții duble în afară de headerul oficial
 	find . \( -name '*.c' -o -name '*.h' \) -exec grep -Hn 'native_handle_t' {} \; | grep -v 'android_stub/cutils/native_handle.h'
 }
 
