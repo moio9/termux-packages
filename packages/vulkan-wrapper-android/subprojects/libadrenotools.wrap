@@ -1,4 +1,4 @@
 [wrap-git]
 directory=libadrenotools
-url=https://gitlab.freedesktop.org/Pipetto-crypto/libadrenotools.git
+url=https://github.com/Pipetto-crypto/libadrenotools.git
 revision=HEAD
