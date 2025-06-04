@@ -42,16 +42,9 @@ termux_step_post_get_source() {
 	rm -rf subprojects
 	mkdir -p subprojects
 
-	cat <<EOF > subprojects/libadrenotools.wrap
-[wrap-git]
-directory = libadrenotools
-url = https://github.com/Pipetto-crypto/libadrenotools.git
-revision = master
-depth = 1
-recursive = true
-EOF
+	cd subprojects
+	git clone --recurse-submodules https://github.com/Pipetto-crypto/libadrenotools.git
 }
-
 
 
 termux_step_pre_configure() {
