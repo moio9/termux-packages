@@ -84,7 +84,7 @@ termux_step_pre_configure() {
 
 	if [ -f "$target_file" ] && grep -q '#include <sys/socket.h>' "$target_file"; then
 		sed -i '/#include <sys\/socket.h>/i #include <bits/sa_family_t.h>' "$target_file"
-
+	fi
 	if [ -f "$target_file" ] && ! grep -q '__TERMUX__' "$target_file"; then
 		sed -i '/static const VkPresentModeKHR present_modes\[\] = {/,/VK_PRESENT_MODE_MAILBOX_KHR,/s/^\(\s*\)VK_PRESENT_MODE_IMMEDIATE_KHR,/\
 \1#ifndef __TERMUX__\
