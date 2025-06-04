@@ -39,13 +39,8 @@ termux_step_post_get_source() {
 	git checkout $_COMMIT
 	rm -rf subprojects
 
-	mkdir -p subprojects
-	cat > subprojects/libadrenotools.wrap <<-EOF
-[wrap-git]
-directory=libadrenotools
-url=https://gitlab.freedesktop.org/Pipetto-crypto/libadrenotools.git
-revision=HEAD
-EOF
+	sed -i '/subproject.*libadrenotools/d' src/vulkan/wrapper/meson.build
+	sed -i '/libadrenotools_dep/d' src/vulkan/wrapper/meson.build
 }
 
 
