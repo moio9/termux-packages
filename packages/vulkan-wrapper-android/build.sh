@@ -56,10 +56,7 @@ EOF
 
 	cd "$TERMUX_PKG_SRCDIR"
 
-	find . \( -name '*.c' -o -name '*.h' \) \
-		! -path '*/android_stub/cutils/native_handle.h' \
-		-exec sed -i '/typedef struct native_handle/,/} native_handle_t;/d' {} +
-
+	# Pune include-ul în toate fișierele care folosesc native_handle_t (dar nu deja în header)
 	find . \( -name '*.c' -o -name '*.h' \) \
 		-exec grep -l 'native_handle_t' {} \; \
 		| while read -r f; do
@@ -71,15 +68,18 @@ EOF
 			fi
 		done
 
+	# Șterge TOATE definițiile duplicate, cu excepția headerului oficial
+	find . \( -name '*.c' -o -name '*.h' \) \
+		! -path '*/android_stub/cutils/native_handle.h' \
+		-exec sed -i '/typedef struct native_handle/,/} native_handle_t;/d' {} +
+
+	# Debug: vezi dacă mai există dubluri
 	echo "==== VERIFICĂ DUPLICATE ===="
 	find . \( -name '*.c' -o -name '*.h' \) \
 		-exec grep -Hn 'native_handle_t' {} \; | grep -v 'android_stub/cutils/native_handle.h'
 	echo "============================"
-
-	find "$TERMUX_PKG_SRCDIR" \( -name '*.c' -o -name '*.h' \) \
-		! -path '*/android_stub/cutils/native_handle.h' \
-		-exec sed -i '/typedef struct native_handle/,/} native_handle_t;/d' {} +
 }
+
 
 
 termux_step_pre_configure() {
