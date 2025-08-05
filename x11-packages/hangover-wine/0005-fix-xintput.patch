@@ -1,11 +1,10 @@
-diff --git a/dlls/xinput1_3/main.c b/dlls/xinput1_3/main.c
-index 1234567..abcdef0 100644
+diff -uNr a/dlls/xinput1_3/main.c b/dlls/xinput1_3/main.c
 --- a/dlls/xinput1_3/main.c
 +++ b/dlls/xinput1_3/main.c
-@@ -1,6 +1,12 @@
- #include "xinput.h"
- #include "wine/debug.h"
- #include "windows.h"
+@@ -0,0 +1,150 @@
++#include "xinput.h"
++#include "wine/debug.h"
++#include "windows.h"
 +#include <stdio.h>
 +#include <stdlib.h>
 +#include <string.h>
@@ -13,41 +12,36 @@ index 1234567..abcdef0 100644
 +#include <ctype.h>
 +#include <stdint.h>
 +
- WINE_DEFAULT_DEBUG_CHANNEL(xinput);
-
- static XINPUT_STATE controller_state;
-@@ -20,6 +26,155 @@
- #define BTN_DPAD_LEFT  XINPUT_GAMEPAD_DPAD_LEFT
- #define BTN_DPAD_RIGHT XINPUT_GAMEPAD_DPAD_RIGHT
-
++WINE_DEFAULT_DEBUG_CHANNEL(xinput);
++
++static XINPUT_STATE controller_state;
 +static CRITICAL_SECTION state_lock;
 +
++#define BTN_A    XINPUT_GAMEPAD_A
++#define BTN_B    XINPUT_GAMEPAD_B
++#define BTN_X    XINPUT_GAMEPAD_X
++#define BTN_Y    XINPUT_GAMEPAD_Y
++#define BTN_LB   XINPUT_GAMEPAD_LEFT_SHOULDER
++#define BTN_RB   XINPUT_GAMEPAD_RIGHT_SHOULDER
++#define BTN_START XINPUT_GAMEPAD_START
++#define BTN_BACK XINPUT_GAMEPAD_BACK
++#define BTN_LS   XINPUT_GAMEPAD_LEFT_THUMB
++#define BTN_RS   XINPUT_GAMEPAD_RIGHT_THUMB
++#define BTN_DPAD_UP    XINPUT_GAMEPAD_DPAD_UP
++#define BTN_DPAD_DOWN  XINPUT_GAMEPAD_DPAD_DOWN
++#define BTN_DPAD_LEFT  XINPUT_GAMEPAD_DPAD_LEFT
++#define BTN_DPAD_RIGHT XINPUT_GAMEPAD_DPAD_RIGHT
++
 +static const int BUTTON_MAP[71] = {
-+    [56] = BTN_A,
-+    [57] = BTN_B,
-+    [59] = BTN_Y,
-+    [60] = BTN_X,
-+    [62] = BTN_LB,
-+    [63] = BTN_RB,
-+    [66] = BTN_START,
-+    [67] = BTN_BACK,
-+    [68] = 0,
-+    [69] = BTN_LS,
-+    [70] = BTN_RS
++    [56] = BTN_A, [57] = BTN_B, [59] = BTN_Y, [60] = BTN_X,
++    [62] = BTN_LB, [63] = BTN_RB, [66] = BTN_START, [67] = BTN_BACK,
++    [68] = 0, [69] = BTN_LS, [70] = BTN_RS
 +};
 +
 +static const int BUTTON_MAP2[12] = {
-+    [1] = BTN_A,
-+    [2] = BTN_B,
-+    [3] = BTN_Y,
-+    [4] = BTN_X,
-+    [5] = BTN_LB,
-+    [6] = BTN_RB,
-+    [7] = BTN_START,
-+    [8] = BTN_BACK,
-+    [9] = 0,
-+    [10] = BTN_LS,
-+    [11] = BTN_RS
++    [1] = BTN_A, [2] = BTN_B, [3] = BTN_Y, [4] = BTN_X,
++    [5] = BTN_LB, [6] = BTN_RB, [7] = BTN_START, [8] = BTN_BACK,
++    [9] = 0, [10] = BTN_LS, [11] = BTN_RS
 +};
 +
 +static int hex_to_int(const char *hex) {
@@ -122,13 +116,8 @@ index 1234567..abcdef0 100644
 +    FILE *pipe;
 +    char line[1024];
 +    pipe = popen("strace -xx -p $(pgrep app_process) -e trace=read -f 2>&1", "r");
-+    if (!pipe) {
-+        WARN("Nu pot porni strace!\n");
-+        return 0;
-+    }
-+    while (fgets(line, sizeof(line), pipe)) {
-+        process_input_line(line);
-+    }
++    if (!pipe) { WARN("Nu pot porni strace!\n"); return 0; }
++    while (fgets(line, sizeof(line), pipe)) process_input_line(line);
 +    pclose(pipe);
 +    return 0;
 +}
@@ -138,12 +127,13 @@ index 1234567..abcdef0 100644
 +        memset(&controller_state, 0, sizeof(controller_state));
 +        InitializeCriticalSection(&state_lock);
 +        CreateThread(NULL, 0, strace_thread, NULL, 0, NULL);
-+        printf("[DEBUG] DLL-ul XInput personalizat a fost încărcat!\n");
++        printf("[DEBUG] XInput DLL personalizat încărcat!\n");
 +        fflush(stdout);
 +    }
 +    return TRUE;
 +}
 +
++DWORD WINAPI XInputGetState(DWORD index, XINPUT_STATE *state) { EnterCriticalSection(&state_lock); *state = controller_state; LeaveCriticalSection(&state_lock); return ERROR_SUCCESS; }
 +DWORD WINAPI XInputSetState(DWORD index, XINPUT_VIBRATION *vibration) { return ERROR_SUCCESS; }
 +DWORD WINAPI XInputGetCapabilities(DWORD index, DWORD flags, XINPUT_CAPABILITIES *caps) { if(caps) memset(caps,0,sizeof(*caps)); return ERROR_SUCCESS; }
 +void WINAPI XInputEnable(BOOL enable) {}
@@ -152,6 +142,3 @@ index 1234567..abcdef0 100644
 +DWORD WINAPI XInputGetKeystroke(DWORD index, DWORD reserved, PXINPUT_KEYSTROKE keystroke) { return ERROR_EMPTY; }
 +DWORD WINAPI XInputGetStateEx(DWORD index, XINPUT_STATE *state) { return XInputGetState(index, state); }
 +DWORD WINAPI XInputGetCapabilitiesEx(DWORD unk, DWORD index, DWORD flags, XINPUT_CAPABILITIES_EX *caps) { return ERROR_NOT_SUPPORTED; }
-+
-+DWORD WINAPI XInputGetState(DWORD index, XINPUT_STATE *state) {
-+    if (!state) return ERROR_BAD_ARGUMENTS;
