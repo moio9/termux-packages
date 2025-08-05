@@ -1,7 +1,7 @@
 diff -uNr a/dlls/xinput1_3/main.c b/dlls/xinput1_3/main.c
 --- a/dlls/xinput1_3/main.c
 +++ b/dlls/xinput1_3/main.c
-@@ -0,0 +1,146 @@
+@@ -0,0 +1,150 @@
 +#include "xinput.h"
 +#include "wine/debug.h"
 +#include "windows.h"
@@ -117,7 +117,7 @@ diff -uNr a/dlls/xinput1_3/main.c b/dlls/xinput1_3/main.c
 +    char line[1024];
 +    pipe = popen("strace -xx -p $(pgrep app_process) -e trace=read -f 2>&1", "r");
 +    if (!pipe) { WARN("Nu pot porni strace!\n"); return 0; }
-+    while (fgets(line, sizeof(line), pipe) process_input_line(line);
++    while (fgets(line, sizeof(line), pipe)) process_input_line(line);
 +    pclose(pipe);
 +    return 0;
 +}
@@ -142,3 +142,4 @@ diff -uNr a/dlls/xinput1_3/main.c b/dlls/xinput1_3/main.c
 +DWORD WINAPI XInputGetKeystroke(DWORD index, DWORD reserved, PXINPUT_KEYSTROKE keystroke) { return ERROR_EMPTY; }
 +DWORD WINAPI XInputGetStateEx(DWORD index, XINPUT_STATE *state) { return XInputGetState(index, state); }
 +DWORD WINAPI XInputGetCapabilitiesEx(DWORD unk, DWORD index, DWORD flags, XINPUT_CAPABILITIES_EX *caps) { return ERROR_NOT_SUPPORTED; }
++
