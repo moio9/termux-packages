@@ -3,14 +3,16 @@ TERMUX_PKG_HOMEPAGE=https://www.rust-lang.org/
 TERMUX_PKG_DESCRIPTION="Systems programming language focused on safety, speed and concurrency"
 TERMUX_PKG_LICENSE="MIT"
 TERMUX_PKG_MAINTAINER="@termux"
-TERMUX_PKG_VERSION="1.87.0"
+TERMUX_PKG_VERSION="1.88.0"
+TERMUX_PKG_REVISION=1
 TERMUX_PKG_SRCURL=https://static.rust-lang.org/dist/rustc-${TERMUX_PKG_VERSION}-src.tar.xz
-TERMUX_PKG_SHA256=8623b8651893e8c6aebfa45b6a90645a4f652f7b18189a0992a90d11ac2631f4
+TERMUX_PKG_SHA256=0c1dcbb4f762513d021e1a282c0ac58c0a423642b3a6bf581cafb5414df4193e
 _LLVM_MAJOR_VERSION=$(. $TERMUX_SCRIPTDIR/packages/libllvm/build.sh; echo $LLVM_MAJOR_VERSION)
 _LLVM_MAJOR_VERSION_NEXT=$((_LLVM_MAJOR_VERSION + 1))
 _LZMA_VERSION=$(. $TERMUX_SCRIPTDIR/packages/liblzma/build.sh; echo $TERMUX_PKG_VERSION)
 TERMUX_PKG_DEPENDS="clang, libandroid-execinfo, libc++, libllvm (<< ${_LLVM_MAJOR_VERSION_NEXT}), lld, openssl, zlib"
 TERMUX_PKG_BUILD_DEPENDS="wasi-libc"
+TERMUX_PKG_SUGGESTS="rust-analyzer"
 TERMUX_PKG_NO_REPLACE_GUESS_SCRIPTS=true
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_AUTO_UPDATE=true
@@ -121,7 +123,7 @@ termux_step_configure() {
 	# like 30 to 40 + minutes ... so lets get it right
 
 	# upstream tests build using versions N and N-1
-	local BOOTSTRAP_VERSION=1.86.0
+	local BOOTSTRAP_VERSION=1.88.0
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "false" ]]; then
 		if ! rustup install "${BOOTSTRAP_VERSION}"; then
 			echo "WARN: ${BOOTSTRAP_VERSION} is unavailable, fallback to stable version!"
@@ -133,6 +135,16 @@ termux_step_configure() {
 	fi
 	local RUSTC=$(command -v rustc)
 	local CARGO=$(command -v cargo)
+
+	# rust 1.89.0
+	export WASI_SDK_PATH="${TERMUX_PKG_TMPDIR}/wasi-sdk"
+	rm -fr "${WASI_SDK_PATH}"
+	mkdir -p "${WASI_SDK_PATH}"/{bin,share}
+	ln -fsv "${TERMUX_PREFIX}/share/wasi-sysroot" "${WASI_SDK_PATH}/share/wasi-sysroot"
+	local clang
+	for clang in wasm32-wasip{1,2}-clang{,++}; do
+		ln -fsv "$(command -v clang)" "${WASI_SDK_PATH}/bin/${clang}"
+	done
 
 	if [[ "${TERMUX_ON_DEVICE_BUILD}" == "true" ]]; then
 		local dir="${TERMUX_STANDALONE_TOOLCHAIN}/toolchains/llvm/prebuilt/linux-x86_64/bin"
@@ -148,10 +160,11 @@ termux_step_configure() {
 	sed \
 		-e "s|@TERMUX_PREFIX@|${TERMUX_PREFIX}|g" \
 		-e "s|@TERMUX_STANDALONE_TOOLCHAIN@|${TERMUX_STANDALONE_TOOLCHAIN}|g" \
+		-e "s|@TERMUX_HOST_LLVM_BASE_DIR@|${TERMUX_HOST_LLVM_BASE_DIR}|g" \
 		-e "s|@CARGO_TARGET_NAME@|${CARGO_TARGET_NAME}|g" \
 		-e "s|@RUSTC@|${RUSTC}|g" \
 		-e "s|@CARGO@|${CARGO}|g" \
-		"${TERMUX_PKG_BUILDER_DIR}"/config.toml > config.toml
+		"${TERMUX_PKG_BUILDER_DIR}"/bootstrap.toml > bootstrap.toml
 
 	local env_host=$(printf $CARGO_TARGET_NAME | tr a-z A-Z | sed s/-/_/g)
 	export ${env_host}_OPENSSL_DIR=$TERMUX_PREFIX
@@ -192,17 +205,20 @@ termux_step_make_install() {
 	local job="install"
 	[[ "${TERMUX_ON_DEVICE_BUILD}" == "true" ]] && job="dist"
 
-	"${TERMUX_PKG_SRCDIR}/x.py" ${job} -j ${TERMUX_PKG_MAKE_PROCESSES} --stage 1
+	# rust 1.87.0
+	# https://github.com/termux/termux-packages/issues/25360
+	# build to stage 2 to fix rust-analyzer error
+	"${TERMUX_PKG_SRCDIR}/x.py" "${job}" -j "${TERMUX_PKG_MAKE_PROCESSES}" --stage 2
 
-	# Not putting wasm32-* into config.toml
-	# CI and on device (wasm32*):
+	# wasm32* not added into bootstrap.toml
+	# due to CI and on device build error:
 	# error: could not document `std`
-	"${TERMUX_PKG_SRCDIR}/x.py" install -j ${TERMUX_PKG_MAKE_PROCESSES} --target wasm32-unknown-unknown --stage 1 std
+	"${TERMUX_PKG_SRCDIR}/x.py" install -j "${TERMUX_PKG_MAKE_PROCESSES}" --target wasm32-unknown-unknown --stage 2 std
 	[[ ! -e "${TERMUX_PREFIX}/share/wasi-sysroot" ]] && termux_error_exit "wasi-sysroot not found"
-	"${TERMUX_PKG_SRCDIR}/x.py" install -j ${TERMUX_PKG_MAKE_PROCESSES} --target wasm32-wasip1 --stage 1 std
-	"${TERMUX_PKG_SRCDIR}/x.py" install -j ${TERMUX_PKG_MAKE_PROCESSES} --target wasm32-wasip2 --stage 1 std
+	"${TERMUX_PKG_SRCDIR}/x.py" install -j "${TERMUX_PKG_MAKE_PROCESSES}" --target wasm32-wasip1 --stage 2 std
+	"${TERMUX_PKG_SRCDIR}/x.py" install -j "${TERMUX_PKG_MAKE_PROCESSES}" --target wasm32-wasip2 --stage 2 std
 
-	"${TERMUX_PKG_SRCDIR}/x.py" dist -j ${TERMUX_PKG_MAKE_PROCESSES} rustc-dev
+	"${TERMUX_PKG_SRCDIR}/x.py" dist -j "${TERMUX_PKG_MAKE_PROCESSES}" --stage 2 rustc-dev
 
 	# remove version suffix: beta, nightly
 	local VERSION=${TERMUX_PKG_VERSION//~*}
@@ -276,3 +292,7 @@ termux_step_make_install() {
 		"
 	fi
 }
+
+# References:
+# https://src.fedoraproject.org/rpms/rust/blob/rawhide/f/rust.spec
+# https://gitlab.archlinux.org/archlinux/packaging/packages/rust/-/blob/main/PKGBUILD
