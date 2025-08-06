@@ -7,8 +7,8 @@ TERMUX_PKG_VERSION="10.11"
 TERMUX_PKG_REVISION=4
 _REAL_VERSION="${TERMUX_PKG_VERSION/\~/-}"
 TERMUX_PKG_SRCURL=(
-	https://github.com/AndreRH/wine/archive/refs/tags/hangover-$_REAL_VERSION.tar.gz
-	https://github.com/AndreRH/hangover/releases/download/hangover-$_REAL_VERSION/hangover_${_REAL_VERSION}_ubuntu2004_focal_arm64.tar
+	https://github.com/moio9/wine/archive/refs/tags/hangover-$_REAL_VERSION.tar.gz
+	https://github.com/moio9/hangover/releases/download/hangover-$_REAL_VERSION/hangover_${_REAL_VERSION}_ubuntu2004_focal_arm64.tar
 )
 TERMUX_PKG_SHA256=(
 	bbe08ba3f405e79a8d5e57472b4d0c7941e113188c05827344c37776b9d6b30a
