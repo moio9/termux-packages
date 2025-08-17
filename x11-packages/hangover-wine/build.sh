@@ -11,7 +11,7 @@ TERMUX_PKG_SRCURL=(
 	https://github.com/moio9/hangover/releases/download/hangover-$_REAL_VERSION/hangover_${_REAL_VERSION}_ubuntu2004_focal_arm64.tar
 )
 TERMUX_PKG_SHA256=(
-	bbe08ba3f405e79a8d5e57472b4d0c7941e113188c05827344c37776b9d6b30a
+	61e00a3b779ee0129ca0917d9bef39ade5bb13960379981cf6a33385c2594661
 	4f55f924c54a01c07ea3fe08ac6c4171d874d3f070ef4aac2bed5fb4458fadea
 )
 TERMUX_PKG_DEPENDS="fontconfig, freetype, krb5, libandroid-spawn, libc++, libgmp, libgnutls, libxcb, libxcomposite, libxcursor, libxfixes, libxrender, opengl, pulseaudio, sdl2, vulkan-loader, xorg-xrandr"
